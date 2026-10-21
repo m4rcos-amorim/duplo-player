@@ -72,6 +72,12 @@ To check it yourself:
    dozens of antivirus engines are the false positive described above.
 3. If you are still unsure, build the app from the source code (next section).
 
+Result for version 1.0.0 (`DuploPlayer-Setup-1.0.0.exe`, SHA256 `38c8af8b…1393`): no engine flagged it,
+0/66 in the [VirusTotal analysis](https://www.virustotal.com/gui/file/38c8af8bd63ba527d7bcc3ed3a51cec949a89c520a72c9ce5e0cdf9914a91393/detection)
+of 2026-10-21 20:22 UTC.
+
+![VirusTotal result for DuploPlayer-Setup-1.0.0.exe: 0 of 66 security vendors flagged the file](docs/virustotal-1.0.0.png)
+
 ## Run from source
 
 **Prerequisites:** Windows 10/11 (64-bit), **Python 3.11 (64-bit)** with the *py launcher*

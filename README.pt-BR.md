@@ -73,6 +73,12 @@ Para conferir você mesmo:
    genéricas entre dezenas de antivírus são o falso positivo descrito acima.
 3. Se ainda tiver dúvida, gere o aplicativo a partir do código-fonte (seção abaixo).
 
+Resultado da versão 1.0.0 (`DuploPlayer-Setup-1.0.0.exe`, SHA256 `38c8af8b…1393`): nenhum antivírus apontou
+o arquivo, 0/66 na [análise do VirusTotal](https://www.virustotal.com/gui/file/38c8af8bd63ba527d7bcc3ed3a51cec949a89c520a72c9ce5e0cdf9914a91393/detection)
+de 21/10/2026, 20:22 UTC.
+
+![Resultado do VirusTotal para DuploPlayer-Setup-1.0.0.exe: 0 de 66 antivírus apontaram o arquivo](docs/virustotal-1.0.0.png)
+
 ## Usar o código-fonte
 
 **Pré-requisitos:** Windows 10/11 de 64 bits, **Python 3.11 de 64 bits** (com o *py launcher*,
