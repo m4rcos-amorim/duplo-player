@@ -1,0 +1,9 @@
+.venv/
+vendor/
+downloads/
+build/
+dist/
+__pycache__/
+*.pyc
+test-output/
+dist-installer/

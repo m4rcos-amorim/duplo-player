@@ -1,0 +1,65 @@
+name: Build Windows
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: x64
+
+      - name: Set up the environment (venv, dependencies, portable VLC)
+        shell: pwsh
+        run: .\setup.ps1
+
+      - name: Unit tests (non-blocking)
+        shell: pwsh
+        continue-on-error: true
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+
+      - name: Build the application (PyInstaller)
+        shell: pwsh
+        run: .\build.ps1
+
+      - name: Set the version
+        shell: pwsh
+        run: |
+          $v = if ($env:GITHUB_REF -like 'refs/tags/v*') { $env:GITHUB_REF_NAME.TrimStart('v') } else { '0.0.0-dev' }
+          "VERSION=$v" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Make sure Inno Setup is installed
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Build the installer
+        shell: pwsh
+        run: .\installer.ps1 -Version $env:VERSION
+
+      - name: Zip the portable version
+        shell: pwsh
+        run: Compress-Archive -Path dist\DuploPlayer\* -DestinationPath "dist-installer\DuploPlayer-portable-$env:VERSION.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DuploPlayer-windows
+          path: dist-installer/*
+
+      - name: Publish to the Releases page (only on v* tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-installer/*
