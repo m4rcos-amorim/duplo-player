@@ -6,7 +6,9 @@ clock, speed and audio.
 
 *Português: veja [README.pt-BR.md](README.pt-BR.md). The app itself speaks English and Brazilian Portuguese.*
 
-![Duplo Player with the screen split: the left view shows the whole frame, the right view zooms 4.5× into a detail of the same frame](docs/screenshot.png)
+![Duplo Player with the screen split: playback is paused, a zoom rectangle is drawn on a face in the left view and on people far away in the right view, then both zoomed views play on in sync](docs/zoom-demo.gif)
+
+<sub>Video: [Talha Uğuz / Pexels](https://www.pexels.com/video/vibrant-street-life-in-ankara-turkey-34892306/).</sub>
 
 ## What makes it different
 

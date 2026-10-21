@@ -6,7 +6,9 @@ mas com o mesmo quadro, relógio, velocidade e áudio.
 
 *English: see [README.md](README.md). O próprio aplicativo fala português (Brasil) e inglês.*
 
-![Duplo Player com a tela dividida: a perspectiva da esquerda mostra o quadro inteiro, a da direita amplia 4,5× um detalhe do mesmo quadro](docs/screenshot.png)
+![Duplo Player com a tela dividida: a reprodução é pausada, um retângulo de zoom é desenhado sobre um rosto na perspectiva da esquerda e sobre pessoas ao fundo na da direita, e as duas perspectivas ampliadas voltam a tocar sincronizadas](docs/zoom-demo.gif)
+
+<sub>Vídeo: [Talha Uğuz / Pexels](https://www.pexels.com/video/vibrant-street-life-in-ankara-turkey-34892306/).</sub>
 
 ## O que o torna diferente
 
