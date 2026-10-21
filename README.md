@@ -6,7 +6,7 @@ clock, speed and audio.
 
 *Português: veja [README.pt-BR.md](README.pt-BR.md). The app itself speaks English and Brazilian Portuguese.*
 
-<!-- TODO: add a screenshot or GIF under docs/ and reference it here. -->
+![Duplo Player with the screen split: the left view shows the whole frame, the right view zooms 4.5× into a detail of the same frame](docs/screenshot.png)
 
 ## Highlights
 

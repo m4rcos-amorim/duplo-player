@@ -6,7 +6,7 @@ mas com o mesmo quadro, relógio, velocidade e áudio.
 
 *English: see [README.md](README.md). O próprio aplicativo fala português (Brasil) e inglês.*
 
-<!-- TODO: adicionar uma captura de tela ou GIF em docs/ e referenciá-la aqui. -->
+![Duplo Player com a tela dividida: a perspectiva da esquerda mostra o quadro inteiro, a da direita amplia 4,5× um detalhe do mesmo quadro](docs/screenshot.png)
 
 ## Destaques
 
