@@ -8,6 +8,17 @@ mas com o mesmo quadro, relógio, velocidade e áudio.
 
 ![Duplo Player com a tela dividida: a perspectiva da esquerda mostra o quadro inteiro, a da direita amplia 4,5× um detalhe do mesmo quadro](docs/screenshot.png)
 
+## O que o torna diferente
+
+- **O mesmo vídeo, duas vezes, em duas telas.** Ctrl+D toca um vídeo em duas perspectivas lado a lado, sempre sincronizadas.
+- **Zoom em cada tela, separadamente.** Arraste um retângulo em qualquer uma para ampliar um detalhe enquanto a outra
+  continua mostrando o quadro inteiro (Ctrl+S liga a seleção; Ctrl+Z desfaz só a tela selecionada).
+- **Girar com um comando simples.** Ctrl+R gira a tela selecionada em 90° no sentido horário, e cada tela guarda a sua rotação.
+- **Gravar o que você vê.** Ctrl+G grava a tela atual (uma ou duas perspectivas, com o zoom e a rotação escolhidos,
+  e o áudio) em um arquivo MP4.
+- **Excluir vídeos dentro do player.** O botão da lixeira envia o vídeo que você está assistindo para a lixeira do Windows,
+  após uma confirmação, sem precisar achá-lo na pasta. Nunca exclui definitivamente.
+
 ## Destaques
 
 - Dupla perspectiva sincronizada: um único decodificador, dois recortes independentes.

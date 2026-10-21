@@ -8,6 +8,17 @@ clock, speed and audio.
 
 ![Duplo Player with the screen split: the left view shows the whole frame, the right view zooms 4.5× into a detail of the same frame](docs/screenshot.png)
 
+## What makes it different
+
+- **The same video, twice, in two screens.** Ctrl+D plays one video in two views side by side, always in sync.
+- **Zoom each screen on its own.** Drag a rectangle on either view to zoom into a detail while the other view
+  keeps the whole picture (Ctrl+S turns the selection on; Ctrl+Z resets only the selected view).
+- **Rotate with a simple command.** Ctrl+R turns the selected view 90° clockwise, and each view keeps its own rotation.
+- **Record what you see.** Ctrl+G records the current screen (one or two views, with the zoom and rotation you chose,
+  and the audio) to an MP4 file.
+- **Delete videos from inside the player.** The trash button sends the video you are watching to the Windows Recycle Bin,
+  after a confirmation, so you do not have to find it in its folder. It never deletes permanently.
+
 ## Highlights
 
 - Synchronized dual view: one decoder, two independent crops.
