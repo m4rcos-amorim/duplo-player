@@ -3,6 +3,7 @@ from collections import deque
 from datetime import datetime
 import os
 import queue
+import re
 import subprocess
 import threading
 import wave
@@ -16,6 +17,18 @@ from PySide6.QtGui import QImage, QPainter
 
 
 RECORDINGS = Path('C:/Videos')
+
+
+def media_duration(path):
+    """Container duration in seconds, as reported by FFmpeg (0 if unknown)."""
+    flags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+    info = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), '-hide_banner', '-i', str(path)],
+                          capture_output=True, timeout=60, creationflags=flags)
+    match = re.search(r'Duration: (\d+):(\d+):(\d+(?:\.\d+)?)', info.stderr.decode('utf-8', errors='replace'))
+    if not match:
+        return 0.0
+    hours, minutes, seconds = match.groups()
+    return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
 
 
 def compose_video(views, split, size, canvas_size):
@@ -249,10 +262,15 @@ class ViewRecorder(QObject):
             if result.returncode or not target.is_file():
                 target.unlink(missing_ok=True)
                 raise RuntimeError(result.stderr.decode('utf-8', errors='replace')[-1000:])
+            # Segments are deleted for good below, so first make sure the
+            # joined file really holds all of them.
+            expected = sum(media_duration(path) for path in sources)
+            if media_duration(target) < expected - 1:
+                target.unlink(missing_ok=True)
+                raise RuntimeError(tr('rec.join_incomplete'))
         except Exception as exc:
             self.join_done.emit('', str(exc), len(sources), '')
             return
-        # The joined video replaces its segments; they stay recoverable.
         kept = []
         for path in sources:
             try:
@@ -263,8 +281,9 @@ class ViewRecorder(QObject):
 
     @staticmethod
     def discard_segment(path):
-        from .recycle import recycle
-        recycle(path)
+        # Permanent delete, not the Recycle Bin: these are the player's own
+        # recordings, already verified inside the joined video.
+        Path(path).unlink()
 
     def _joined(self, path, error, count, kept):
         self.joining = False

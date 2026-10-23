@@ -19,7 +19,6 @@ output = ROOT / 'test-output' / 'segments'
 output.mkdir(parents=True, exist_ok=True)
 results = []
 errors = []
-discarded = []
 
 def pump(seconds):
     end = time.monotonic() + seconds
@@ -83,14 +82,13 @@ def run():
             total = sum(item[1] for item in probes)
             assert size == probes[0][0] and audio, (size, audio)
             assert abs(duration - total) < .35, (duration, total)
-            assert discarded == segments, discarded
+            assert not any(path.exists() for path in segments), 'segments were not deleted'
             assert window.recorder.segments == [] and not window.join_button.isEnabled()
             assert window.record_info.text().endswith(path), window.record_info.text()
             results.append({'joined_mp4': path, 'segments': 3, 'size': list(size), 'duration': duration,
                             'segment_durations': [item[1] for item in probes], 'aac_audio': audio,
                             'fullscreen_and_split_between_segments': True})
             # Ctrl+Shift+G while recording finishes that segment, then joins.
-            discarded.clear()
             joined.clear()
             first = record(window, .6)
             window.toggle_recording()
@@ -99,8 +97,20 @@ def run():
             wait(lambda: joined)
             path, error, count, kept = joined[0]
             assert path and not error and count == 2, joined
-            assert discarded[0] == first and len(discarded) == 2, discarded
-            results.append('join while recording finishes the segment first')
+            assert not first.exists() and not window.recorder.path.exists()
+            results.append('join while recording finishes the segment first; segments deleted')
+            # A joined file shorter than its segments is discarded and the segments are kept.
+            joined.clear()
+            kept = [record(window, .6), record(window, .6)]
+            with patch('duplo.recording.media_duration', side_effect=lambda path: 0.0 if '_joined' in str(path) else 5.0):
+                window.join_recordings()
+                wait(lambda: joined)
+            path, error, count, _ = joined[0]
+            assert not path and error and all(item.exists() for item in kept), joined
+            assert window.recorder.segments == kept
+            errors.clear()
+            results.append('incomplete join keeps the segments')
+            window.recorder.segments = kept[:1]
             window.join_recordings()
             assert not window.recorder.joining
             results.append('joining needs at least two segments')
@@ -112,7 +122,5 @@ def run():
                                          encoding='utf-8')
     print(json.dumps(results, indent=2), flush=True)
 
-# The test keeps the segment files instead of sending them to the Recycle Bin.
-with patch.object(QMessageBox, 'warning', side_effect=lambda *args: errors.append(str(args[-1]))), \
-     patch('duplo.recording.ViewRecorder.discard_segment', side_effect=discarded.append):
+with patch.object(QMessageBox, 'warning', side_effect=lambda *args: errors.append(str(args[-1]))):
     run()

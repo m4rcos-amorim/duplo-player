@@ -515,7 +515,7 @@ class PlayerWindow(QMainWindow):
             return
         message = tr('rec.joined', n=count, path=path)
         if kept:
-            message += ' • ' + tr('rec.join_not_recycled', names=kept)
+            message += ' • ' + tr('rec.join_not_deleted', names=kept)
         self.record_info.setText(message)
         self.statusBar().showMessage(message, 10000)
 

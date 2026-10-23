@@ -275,12 +275,12 @@ Rodado no Windows 11 Pro (10.0.26200), Python 3.11, VLC 3.0.24 — 21/10/2026:
   da janela, não das perspectivas, por isso nunca entra na gravação.
 - Ctrl+G continua gravando um MP4 por início/fim. Ctrl+Shift+G (botão e menu do botão direito) junta os
   trechos gravados desde a última junção, em ordem, por cópia de fluxo no FFmpeg (sem recodificar). Os trechos
-  seguintes usam o tamanho do primeiro. Após juntar com sucesso, os trechos vão para a lixeira; em caso de
-  falha, são mantidos.
+  seguintes usam o tamanho do primeiro. Após juntar, e depois de conferir a duração do vídeo unido com a dos
+  trechos, os trechos são excluídos definitivamente (sem passar pela lixeira); em caso de falha, são mantidos.
 - 71 testes unitários aprovados (3 novos: a barra aparece/some conforme a zona do cursor e sai junto com a
   tela cheia; clicar nela faz a busca; juntar exige dois trechos). `integration.py` passou nas 25 verificações;
   `recording_integration.py` passou.
-- Novo `segments_integration.py` aprovado com VLC e FFmpeg reais (em `test-output\segments`, com a lixeira
-  simulada): 3 trechos de 1,03, 1,23 e 0,83 s gravados em janela, tela cheia e tela dividida, todos 1268×644,
+- Novo `segments_integration.py` aprovado com VLC e FFmpeg reais (em `test-output\segments`): 3 trechos de 1,03, 1,23 e 0,83 s gravados em janela, tela cheia e tela dividida, todos 1268×644,
   unidos em um MP4 de 3,12 s com áudio AAC, decodificado sem erros; Ctrl+Shift+G durante a gravação
-  finalizou aquele trecho e juntou 2 trechos.
+  finalizou aquele trecho e juntou 2 trechos; os arquivos dos trechos unidos foram excluídos, e um vídeo
+  unido mais curto que os trechos (simulado) foi descartado, mantendo os trechos.

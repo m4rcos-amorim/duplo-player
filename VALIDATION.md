@@ -276,11 +276,11 @@ Run on Windows 11 Pro (10.0.26200), Python 3.11, VLC 3.0.24 — 2026-10-21:
   window, not of the views, so it is never drawn into recordings.
 - Ctrl+G still records one MP4 per start/stop. Ctrl+Shift+G (button and right-click menu) joins the segments
   recorded since the last join, in order, with an FFmpeg stream copy (no re-encoding). Later segments reuse
-  the first segment's frame size. After a successful join the segments are sent to the Recycle Bin; on failure
-  they are kept.
+  the first segment's frame size. After the join, and once the joined file's duration matches the segments,
+  the segments are deleted permanently (not via the Recycle Bin); on failure they are kept.
 - 71 unit tests passed (3 new: timeline shows/hides by cursor zone and leaves with full screen; a click on it
   seeks; joining needs two segments). `integration.py` passed all 25 checks; `recording_integration.py` passed.
-- New `segments_integration.py` passed with the real VLC and FFmpeg (into `test-output\segments`, with the
-  Recycle Bin step mocked): 3 segments of 1.03, 1.23 and 0.83 s recorded in window, full screen and split
+- New `segments_integration.py` passed with the real VLC and FFmpeg (into `test-output\segments`): 3 segments of 1.03, 1.23 and 0.83 s recorded in window, full screen and split
   view, all 1268×644, joined into one 3.12 s MP4 with AAC audio that decodes without errors; Ctrl+Shift+G
-  while recording finished that segment and joined 2 segments.
+  while recording finished that segment and joined 2 segments; the joined segment files were deleted, and a
+  joined file shorter than its segments (simulated) was discarded with the segments kept.
