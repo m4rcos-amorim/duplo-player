@@ -565,5 +565,64 @@ class PlayerUITests(unittest.TestCase):
                 window.add_paths([files[2]], play_immediately=True)
                 load.assert_not_called()
 
+    def test_fullscreen_timeline_floats_only_while_mouse_is_near_bottom(self):
+        window = self.window
+        window.timer.stop()
+        window.update_timeline(QPoint(100, window.centralWidget().height() - 5))
+        self.assertFalse(window.timeline.isVisible())
+        window.toggle_fullscreen()
+        QTest.qWait(50)
+        area = window.centralWidget().rect()
+        window.update_timeline(QPoint(area.width() // 2, area.height() // 2))
+        self.assertFalse(window.timeline.isVisible())
+        window.update_timeline(QPoint(area.width() // 2, area.height() - 10))
+        self.assertTrue(window.timeline.isVisible())
+        geometry = window.timeline.geometry()
+        self.assertTrue(area.contains(geometry))
+        self.assertGreater(geometry.top(), area.height() // 2)
+        # Over the bar itself it stays; leaving the zone hides it again.
+        window.update_timeline(geometry.center())
+        self.assertTrue(window.timeline.isVisible())
+        window.update_timeline(QPoint(area.width() // 2, 10))
+        self.assertFalse(window.timeline.isVisible())
+        # Video only stays video only for recording: the bar is not in the views.
+        self.assertFalse(any(window.timeline.parentWidget() is view for view in window.views))
+        window.update_timeline(QPoint(area.width() // 2, area.height() - 10))
+        window.toggle_fullscreen()
+        QTest.qWait(20)
+        self.assertFalse(window.timeline.isVisible())
+
+    def test_fullscreen_timeline_click_seeks(self):
+        window = self.window
+        window.timer.stop()
+        window.toggle_fullscreen()
+        QTest.qWait(50)
+        area = window.centralWidget().rect()
+        window.update_timeline(QPoint(area.width() // 2, area.height() - 10))
+        slider = window.timeline.slider
+        with patch.object(window, 'seek_fraction') as seek:
+            slider.seek_requested.disconnect()
+            slider.seek_requested.connect(window.seek_fraction)
+            QTest.mouseClick(slider, Qt.MouseButton.LeftButton, pos=QPoint(slider.width() // 4, slider.height() // 2))
+            seek.assert_called()
+            self.assertAlmostEqual(seek.call_args_list[0].args[0], 2500, delta=150)
+
+    def test_join_needs_two_segments_and_offers_menu_entry(self):
+        window = self.window
+        self.assertFalse(window.join_button.isEnabled())
+        window.join_recordings()
+        self.assertEqual(window.statusBar().currentMessage(), tr('rec.join_need'))
+        window.recorder.segments = [Path('one.mp4')]
+        window._segments_changed(1)
+        self.assertTrue(window.join_button.isEnabled())
+        with patch.object(window.recorder, 'join') as join:
+            window.join_recordings()
+            join.assert_not_called()
+            window.recorder.segments.append(Path('two.mp4'))
+            join.return_value = True
+            window.join_recordings()
+            join.assert_called_once()
+        self.assertEqual(window.record_info.text(), tr('rec.joining', n=2))
+
 if __name__ == '__main__':
     unittest.main()

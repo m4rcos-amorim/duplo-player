@@ -6,6 +6,9 @@ QLabel#subtitle { color: #8b9bab; }
 QLabel#filename { font-size: 12px; font-weight: 600; }
 QWidget#controls { background: #141e29; border-radius: 6px; }
 QLabel#counter { color: #8b9bab; }
+QWidget#floating_timeline { background: rgba(16, 23, 32, 215); border: 1px solid #2b3b4d; border-radius: 10px; }
+QWidget#floating_timeline QSlider, QLabel#floating_clock { background: transparent; }
+QLabel#floating_clock { color: #dee8f1; font-weight: 600; }
 QPushButton, QToolButton { background: #1c2835; border: 1px solid #2b3b4d; border-radius: 6px;
                           padding: 4px; min-height: 18px; }
 QPushButton:hover, QToolButton:hover { border-color: #51ddc3; background: #243649; }

@@ -1,8 +1,8 @@
 from pathlib import Path
 import time
 
-from PySide6.QtCore import QSize, QEvent, QSettings, Qt, QTimer, Signal
-from PySide6.QtGui import QAction, QKeySequence, QShortcut
+from PySide6.QtCore import QRect, QSize, QEvent, QSettings, Qt, QTimer, Signal
+from PySide6.QtGui import QAction, QCursor, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QComboBox, QFileDialog, QHBoxLayout, QLabel, QListWidget,
                               QListWidgetItem, QMainWindow, QMenu, QMessageBox,
                               QPushButton, QSlider, QSplitter, QVBoxLayout, QWidget, QWidgetAction)
@@ -27,6 +27,43 @@ class SeekSlider(QSlider):
             self.setValue(value)
             self.seek_requested.emit(value)
         super().mousePressEvent(event)
+
+
+class FloatingTimeline(QWidget):
+    """Timeline shown over the video in full screen while the mouse is near it."""
+    ZONE = 90  # pixels from the bottom edge that reveal the bar
+    MARGIN = 24
+    HEIGHT = 46
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setObjectName('floating_timeline')
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(14, 6, 14, 6)
+        layout.setSpacing(12)
+        self.slider = SeekSlider(Qt.Orientation.Horizontal)
+        self.slider.setRange(0, 10000)
+        self.slider.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        layout.addWidget(self.slider, 1)
+        self.clock = QLabel('00:00:00 / 00:00:00')
+        self.clock.setObjectName('floating_clock')
+        layout.addWidget(self.clock)
+        self.hide()
+
+    def place(self):
+        area = self.parentWidget().rect()
+        geometry = QRect(self.MARGIN, area.height() - self.HEIGHT - 16,
+                         max(1, area.width() - 2 * self.MARGIN), self.HEIGHT)
+        if self.geometry() != geometry:
+            self.setGeometry(geometry)
+
+    def wanted(self, cursor):
+        """Visible while the cursor is in the bottom zone, or dragging the slider."""
+        area = self.parentWidget().rect()
+        return self.slider.isSliderDown() or (area.contains(cursor)
+                                              and cursor.y() >= area.height() - self.ZONE)
 
 
 class PlayerWindow(QMainWindow):
@@ -55,6 +92,8 @@ class PlayerWindow(QMainWindow):
         self.recorder.changed.connect(self._record_changed)
         self.recorder.saved.connect(self._record_saved)
         self.recorder.failed.connect(self._record_failed)
+        self.recorder.segments_changed.connect(self._segments_changed)
+        self.recorder.joined.connect(self._segments_joined)
         self._closing_after_record = False
         self._bind_shortcuts()
         QApplication.instance().installEventFilter(self)
@@ -181,6 +220,9 @@ class PlayerWindow(QMainWindow):
         self.repeat.hide()
         self.record_button = self.button(tr('btn.record'), self.toggle_recording, 'Ctrl+G', glyph='record')
         playback.addWidget(self.record_button)
+        self.join_button = self.button(tr('btn.join'), self.join_recordings, 'Ctrl+Shift+G', glyph='join')
+        self.join_button.setEnabled(False)
+        playback.addWidget(self.join_button)
         self.noise_button = self.button(tr('btn.noise'), self.toggle_noise,
                                         'Ctrl+H', True, glyph='noise')
         playback.addWidget(self.noise_button)
@@ -243,6 +285,10 @@ class PlayerWindow(QMainWindow):
         dock.addWidget(self.record_info)
         outer.addWidget(self.controls)
         self.setCentralWidget(root)
+        # Not in a layout: it floats over the video and never enters a recording.
+        self.timeline = FloatingTimeline(root)
+        self.timeline.slider.seek_requested.connect(self.seek_fraction)
+        self.timeline.slider.sliderMoved.connect(self.seek_fraction)
         self.statusBar().setSizeGripEnabled(False)
         self.statusBar().showMessage(tr('status.start'))
 
@@ -266,7 +312,8 @@ class PlayerWindow(QMainWindow):
         shortcuts = {'Ctrl+O': self.open_files, 'Ctrl+Shift+O': self.open_folder,
                      'Space': self.play_pause, 'D': self.toggle_split, 'Z': self.toggle_zoom,
                      'Ctrl+S': self.toggle_zoom, 'Ctrl+D': self.toggle_split, '3': self.mark_ab,
-                     'Ctrl+H': self.toggle_noise, 'Ctrl+R': self.rotate_view, 'Ctrl+Z': self.reset_zoom, 'Ctrl+G': self.toggle_recording, 'R': self.reset_zoom, 'Shift+R': self.reset_all_zoom,
+                     'Ctrl+H': self.toggle_noise, 'Ctrl+R': self.rotate_view, 'Ctrl+Z': self.reset_zoom, 'Ctrl+G': self.toggle_recording,
+                     'Ctrl+Shift+G': self.join_recordings, 'R': self.reset_zoom, 'Shift+R': self.reset_all_zoom,
                      'F11': self.toggle_fullscreen, 'Escape': self.escape, 'F1': self.show_help,
                      'A': self.mark_a, 'B': self.mark_b, 'C': self.clear_ab,
                      'N': self.next, 'P': self.previous, '1': self.previous, '2': self.next,
@@ -280,7 +327,7 @@ class PlayerWindow(QMainWindow):
         for key, callback in shortcuts.items():
             shortcut = QShortcut(QKeySequence(key), self)
             shortcut.setContext(Qt.ShortcutContext.WindowShortcut)
-            if key in ('1', '2', '3', 'Ctrl+S', 'Ctrl+D', 'D', 'Ctrl+Z', 'Ctrl+G', 'Ctrl+R', 'Ctrl+H', '-', 'Num+-', '+', 'Shift++', 'Num++'):
+            if key in ('1', '2', '3', 'Ctrl+S', 'Ctrl+D', 'D', 'Ctrl+Z', 'Ctrl+G', 'Ctrl+Shift+G', 'Ctrl+R', 'Ctrl+H', '-', 'Num+-', '+', 'Shift++', 'Num++'):
                 shortcut.setAutoRepeat(False)
             shortcut.activated.connect(callback)
             self._shortcuts.append(shortcut)
@@ -379,7 +426,10 @@ class PlayerWindow(QMainWindow):
         self.clear_ab()
         self.seek_slider.setValue(0)
         self.seek_slider.setEnabled(False)
+        self.timeline.slider.setValue(0)
+        self.timeline.slider.setEnabled(False)
         self.clock.setText('00:00:00 / 00:00:00')
+        self.timeline.clock.setText(self.clock.text())
         self.play_button.setIcon(icon('play', dark=True))
         for view in self.views:
             view.set_frame(None)
@@ -438,7 +488,36 @@ class PlayerWindow(QMainWindow):
     def _record_changed(self, active):
         self.record_button.setIcon(icon('stop' if active else 'record'))
         self.record_button.setToolTip(tr('rec.stop_tip') if active else tr('rec.start_tip'))
-        self.record_info.setText(tr('rec.active', path=self.recorder.path) if active else tr('rec.finishing'))
+        self.record_info.setText(tr('rec.active', n=len(self.recorder.segments) + 1, path=self.recorder.path)
+                                 if active else tr('rec.finishing'))
+        self.join_button.setEnabled(bool(self.recorder.segments) or active)
+
+    def join_recordings(self):
+        recorder = self.recorder
+        count = len(recorder.segments) + (1 if recorder.active else 0)
+        if recorder.joining:
+            self.statusBar().showMessage(tr('rec.joining', n=len(recorder.segments)), 5000)
+        elif count < 2 and not recorder.finishing:
+            self.statusBar().showMessage(tr('rec.join_need'), 8000)
+        elif recorder.join():
+            self.record_info.setText(tr('rec.joining', n=count))
+            self.statusBar().showMessage(tr('rec.joining', n=count), 5000)
+
+    def _segments_changed(self, count):
+        self.join_button.setEnabled(count > 0 or self.recorder.active)
+        if count:
+            self.record_info.setText(tr('rec.segments', n=count, path=self.recorder.segments[-1]))
+
+    def _segments_joined(self, path, error, count, kept):
+        if not path:
+            self.record_info.setText(tr('rec.failed_info', message=error))
+            QMessageBox.warning(self, tr('rec.join_failed_title'), tr('rec.join_kept', error=error))
+            return
+        message = tr('rec.joined', n=count, path=path)
+        if kept:
+            message += ' • ' + tr('rec.join_not_recycled', names=kept)
+        self.record_info.setText(message)
+        self.statusBar().showMessage(message, 10000)
 
     def _record_saved(self, path):
         self.record_info.setText(tr('rec.saved', path=path))
@@ -611,6 +690,23 @@ class PlayerWindow(QMainWindow):
         self.video_splitter.setStyleSheet('QSplitter::handle { background: #000; width: 0px; }' if enabled else '')
         for view in self.views:
             view.set_presentation(enabled)
+        if not enabled:
+            self.timeline.hide()
+
+    def update_timeline(self, cursor=None):
+        """Show the floating timeline in full screen only while the mouse is over its zone."""
+        if not self.isFullScreen():
+            self.timeline.hide()
+            return
+        if cursor is None:
+            cursor = self.centralWidget().mapFromGlobal(QCursor.pos())
+        if self.timeline.wanted(cursor):
+            self.timeline.place()
+            if not self.timeline.isVisible():
+                self.timeline.show()
+                self.timeline.raise_()
+        else:
+            self.timeline.hide()
 
     def toggle_fullscreen(self):
         if self.isFullScreen():
@@ -679,6 +775,8 @@ class PlayerWindow(QMainWindow):
             action.triggered.connect(lambda checked=False, i=index: self.speed.setCurrentIndex(i))
         menu.addAction(tr('menu.fullscreen'), self.toggle_fullscreen)
         menu.addAction(tr('menu.rec_stop') if self.recorder.active else tr('menu.rec_start'), self.toggle_recording)
+        join = menu.addAction(tr('menu.rec_join', n=len(self.recorder.segments)), self.join_recordings)
+        join.setEnabled(self.join_button.isEnabled())
         menu.addSeparator()
         language_menu = menu.addMenu(tr('menu.language'))
         for code, name in LANGUAGES.items():
@@ -779,6 +877,7 @@ class PlayerWindow(QMainWindow):
         if frame is not None:
             for view in self.views:
                 view.set_frame(frame)
+        self.update_timeline()
         if not self._loaded:
             return
         player = self.engine.player
@@ -788,10 +887,13 @@ class PlayerWindow(QMainWindow):
         if state == vlc.State.Playing:
             self._last_position = position
         self.play_button.setIcon(icon('pause' if state == vlc.State.Playing else 'play', dark=True))
-        self.seek_slider.setEnabled(bool(player.is_seekable()) and duration > 0)
+        seekable = bool(player.is_seekable()) and duration > 0
         self.clock.setText(f'{timestamp(position)} / {timestamp(duration)}')
-        if not self.seek_slider.isSliderDown() and duration:
-            self.seek_slider.setValue(int(position / duration * 10000))
+        self.timeline.clock.setText(self.clock.text())
+        for slider in (self.seek_slider, self.timeline.slider):
+            slider.setEnabled(seekable)
+            if not slider.isSliderDown() and duration:
+                slider.setValue(int(position / duration * 10000))
         if self.loop.enabled and state == vlc.State.Playing and position >= self.loop.b:
             if time.monotonic() - self._loop_seek_time > 0.12:
                 self.engine.seek(self.loop.a)
@@ -843,6 +945,12 @@ class PlayerWindow(QMainWindow):
         if self.recorder.active or self.recorder.finishing:
             self._closing_after_record = True
             self.recorder.stop()
+            event.ignore()
+            return
+        if self.recorder.joining:
+            # Let the stream copy finish; segments are only recycled after it succeeds.
+            self._closing_after_record = True
+            self.recorder.joined.connect(lambda *args: QTimer.singleShot(0, self.close))
             event.ignore()
             return
         self.timer.stop()

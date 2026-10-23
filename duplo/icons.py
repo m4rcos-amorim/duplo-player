@@ -19,6 +19,7 @@ PATHS = {
  'repeat-off': '<path d="M5 7h13l3 3m-3-6 3 6h-6M19 17H6l-3-3m3 6-3-6h6M3 2l18 20"/>',
  'repeat-one': '<path d="M5 7h13l3 3m-3-6 3 6h-6M19 17H6l-3-3m3 6-3-6h6M11 10h2v5"/>',
  'record': '<circle cx="12" cy="12" r="8" fill="#fa707b" stroke="#fa707b"/>',
+ 'join': '<path d="M3 5v14M21 5v14M6 12h5m-3-3 3 3-3 3M18 12h-5m3-3-3 3 3 3"/>',
  'split': '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 4v16"/>',
  'zoom': '<path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6M8 12h8M12 8v8"/>',
  'rotate': '<path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/><path d="M9 9h6v6H9z"/>',

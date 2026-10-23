@@ -17,7 +17,8 @@ mas com o mesmo quadro, relógio, velocidade e áudio.
   continua mostrando o quadro inteiro (Ctrl+S liga a seleção; Ctrl+Z desfaz só a tela selecionada).
 - **Girar com um comando simples.** Ctrl+R gira a tela selecionada em 90° no sentido horário, e cada tela guarda a sua rotação.
 - **Gravar o que você vê.** Ctrl+G grava a tela atual (uma ou duas perspectivas, com o zoom e a rotação escolhidos,
-  e o áudio) em um arquivo MP4.
+  e o áudio) em um arquivo MP4. Grave vários trechos (início, meio, fim…) e o Ctrl+Shift+G junta todos em um
+  único vídeo.
 - **Excluir vídeos dentro do player.** O botão da lixeira envia o vídeo que você está assistindo para a lixeira do Windows,
   após uma confirmação, sem precisar achá-lo na pasta. Nunca exclui definitivamente.
 
@@ -216,7 +217,9 @@ do FFmpeg e do VLC está disponível nos sites dos projetos (links em `THIRD-PAR
   Funciona em tela cheia, com zoom e na gravação; repetir o vídeo mantém a rotação.
 - Tela cheia real: **F11** ou duplo clique mostram somente o vídeo, sem botões,
   títulos ou lista. A divisão e os recortes de zoom são preservados. **Esc** retorna
-  ao modo janela. Atalhos e menu do botão direito continuam disponíveis.
+  ao modo janela. Atalhos e menu do botão direito continuam disponíveis. Leve o mouse
+  à parte de baixo da tela para ver a barra de tempo flutuante (clique ou arraste para
+  buscar); ela some quando o mouse sai dela e nunca entra na gravação.
 - Câmera lenta de **0,1× a 0,75×**, velocidade normal e acelerada até **2×**.
   A tecla **-** reduz em etapas: **0,75× → 0,5× → 0,25×**, também em tela cheia.
   A tecla **+** aumenta a velocidade, passando por **1×** e acelerando até **2×**.
@@ -253,6 +256,18 @@ pretas. Durante a gravação, arquivos temporários ficam em uma pasta própria 
 C:\Videos; eles são removidos após a finalização. Em caso de falha, são preservados
 para recuperação. Aguarde a mensagem **Gravação salva** antes de abrir o arquivo.
 
+#### Vários trechos em um só vídeo
+
+Cada início/fim com Ctrl+G grava um trecho, salvo como um MP4 próprio, como acima. Grave quantos quiser,
+por exemplo um no início, um no meio e outro no fim, inclusive de vídeos diferentes. Depois pressione
+**Ctrl+Shift+G** (ou o botão de juntar ao lado do botão de gravar, ou o menu do botão direito) para uni-los,
+na ordem em que foram gravados, em um único `Duplo_…_joined.mp4` em C:\Videos. Se um trecho ainda estiver
+sendo gravado, ele é finalizado primeiro e vira a última parte. A junção copia os fluxos sem recodificar,
+então é rápida e mantém a qualidade: os trechos seguintes usam a resolução do primeiro, com barras pretas se
+a janela mudou de tamanho. Depois de juntar com sucesso, os arquivos dos trechos vão para a lixeira do
+Windows, de onde podem ser recuperados; se a junção falhar, eles são mantidos. São necessários pelo menos
+dois trechos.
+
 ### Atalhos
 
 | Tecla | Ação |
@@ -263,7 +278,8 @@ para recuperação. Aguarde a mensagem **Gravação salva** antes de abrir o arq
 | Ctrl+Z / R | Restaurar somente o zoom da tela selecionada |
 | Shift+R | Restaurar os dois zooms |
 | Ctrl+R | Girar a perspectiva selecionada 90° no sentido horário |
-| Ctrl+G | Iniciar / encerrar gravação |
+| Ctrl+G | Iniciar / encerrar gravação (um trecho) |
+| Ctrl+Shift+G | Juntar os trechos gravados em um só vídeo |
 | Ctrl+D / D | Ativar / desativar tela dupla, inclusive em tela cheia |
 | 3 | Marcar A, depois B; com trecho ativo, iniciar nova marcação |
 | A / B / C | Marcar A / marcar B / limpar A–B |

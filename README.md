@@ -17,7 +17,8 @@ clock, speed and audio.
   keeps the whole picture (Ctrl+S turns the selection on; Ctrl+Z resets only the selected view).
 - **Rotate with a simple command.** Ctrl+R turns the selected view 90° clockwise, and each view keeps its own rotation.
 - **Record what you see.** Ctrl+G records the current screen (one or two views, with the zoom and rotation you chose,
-  and the audio) to an MP4 file.
+  and the audio) to an MP4 file. Record several segments (beginning, middle, end…) and Ctrl+Shift+G joins them
+  into a single video.
 - **Delete videos from inside the player.** The trash button sends the video you are watching to the Windows Recycle Bin,
   after a confirmation, so you do not have to find it in its folder. It never deletes permanently.
 
@@ -209,7 +210,8 @@ source code is available from the projects' websites (links in `THIRD-PARTY.md`)
   It works in full screen, with zoom and in recordings; repeating the video keeps the rotation.
 - True full screen: **F11** or a double-click shows only the video, with no buttons, titles or list.
   The split and the zoom crops are preserved. **Esc** returns to windowed mode.
-  Shortcuts and the right-click menu keep working.
+  Shortcuts and the right-click menu keep working. Move the mouse to the bottom of the screen to show a
+  floating timeline (click or drag to seek); it hides again when the mouse leaves it and never enters recordings.
 - Slow motion from **0.1× to 0.75×**, normal speed and speed-up to **2×**.
   The **-** key lowers the speed in steps: **0.75× → 0.5× → 0.25×**, also in full screen.
   The **+** key raises the speed, passing through **1×** and speeding up to **2×**.
@@ -242,6 +244,17 @@ the window keeps the aspect ratio using black bars. While recording, temporary f
 folder inside C:\Videos; they are removed once the recording is finished. If something fails they are kept
 so you can recover them. Wait for the **Recording saved** message before opening the file.
 
+#### Several segments in one video
+
+Each Ctrl+G start/stop records one segment, saved as its own MP4 as above. Record as many as you like, for
+example one at the beginning, one in the middle and one at the end, even across different videos. Then press
+**Ctrl+Shift+G** (or the join button next to the record button, or the right-click menu) to join them, in
+recording order, into one `Duplo_…_joined.mp4` in C:\Videos. If a segment is still recording, it is finished
+first and becomes the last part. The join copies the streams without re-encoding, so it is fast and keeps the
+quality: every segment after the first uses the first one's resolution, with black bars if the window changed
+size. After a successful join, the segment files go to the Windows Recycle Bin, where you can restore them;
+if the join fails they are kept. At least two segments are needed.
+
 ### Shortcuts
 
 | Key | Action |
@@ -252,7 +265,8 @@ so you can recover them. Wait for the **Recording saved** message before opening
 | Ctrl+Z / R | Reset only the selected view's zoom |
 | Shift+R | Reset both zooms |
 | Ctrl+R | Rotate the selected view 90° clockwise |
-| Ctrl+G | Start / stop recording |
+| Ctrl+G | Start / stop recording (one segment) |
+| Ctrl+Shift+G | Join the recorded segments into one video |
 | Ctrl+D / D | Turn the dual view on / off, also in full screen |
 | 3 | Set A, then B; with an active range, start a new one |
 | A / B / C | Set A / set B / clear A–B |

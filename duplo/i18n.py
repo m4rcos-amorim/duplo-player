@@ -57,6 +57,7 @@ _T = {
     'btn.frame': ('Avançar quadro', 'Step one frame'),
     'btn.order': ('Ordem: {mode}', 'Order: {mode}'),
     'btn.record': ('Iniciar / encerrar gravação em C:\\Videos', 'Start / stop recording to C:\\Videos'),
+    'btn.join': ('Juntar os trechos gravados em um só vídeo', 'Join the recorded segments into one video'),
     'btn.noise': ('Ligar / desligar supressão de ruído', 'Turn noise suppression on / off'),
     'btn.mute': ('Silenciar', 'Mute'),
     'btn.split': ('Dividir / unir tela', 'Split / merge screen'),
@@ -117,7 +118,17 @@ _T = {
     # --- recording ---
     'rec.stop_tip': ('Encerrar gravação (Ctrl+G)', 'Stop recording (Ctrl+G)'),
     'rec.start_tip': ('Gravar exibição em C:\\Videos (Ctrl+G)', 'Record the display to C:\\Videos (Ctrl+G)'),
-    'rec.active': ('● GRAVANDO • Ctrl+G encerra • {path}', '● RECORDING • Ctrl+G stops • {path}'),
+    'rec.active': ('● GRAVANDO trecho {n} • Ctrl+G encerra • {path}', '● RECORDING segment {n} • Ctrl+G stops • {path}'),
+    'rec.segments': ('{n} trecho(s) gravado(s) • Ctrl+G grava outro • Ctrl+Shift+G junta em um só vídeo • {path}',
+                     '{n} segment(s) recorded • Ctrl+G records another • Ctrl+Shift+G joins them into one video • {path}'),
+    'rec.join_need': ('Grave pelo menos dois trechos com Ctrl+G antes de juntar.',
+                      'Record at least two segments with Ctrl+G before joining.'),
+    'rec.joining': ('Juntando {n} trechos em um só vídeo…', 'Joining {n} segments into one video…'),
+    'rec.joined': ('Vídeo único salvo ({n} trechos): {path}', 'Single video saved ({n} segments): {path}'),
+    'rec.join_not_recycled': ('mantidos fora da lixeira: {names}', 'not moved to the Recycle Bin: {names}'),
+    'rec.join_failed_title': ('Não foi possível juntar os trechos', 'Could not join the segments'),
+    'rec.join_kept': ('Os trechos foram mantidos.\n\n{error}', 'The segments were kept.\n\n{error}'),
+    'rec.join_missing': ('Trechos não encontrados:\n{paths}', 'Segments not found:\n{paths}'),
     'rec.finishing': ('Finalizando gravação…', 'Finishing the recording…'),
     'rec.saved': ('Gravação salva: {path}', 'Recording saved: {path}'),
     'rec.failed_info': ('Falha na gravação: {message}', 'Recording failed: {message}'),
@@ -163,6 +174,8 @@ _T = {
     'menu.fullscreen': ('Tela cheia (F11)', 'Full screen (F11)'),
     'menu.rec_stop': ('Encerrar gravação (Ctrl+G)', 'Stop recording (Ctrl+G)'),
     'menu.rec_start': ('Gravar exibição (Ctrl+G)', 'Record display (Ctrl+G)'),
+    'menu.rec_join': ('Juntar {n} trecho(s) gravado(s) em um só vídeo (Ctrl+Shift+G)',
+                      'Join {n} recorded segment(s) into one video (Ctrl+Shift+G)'),
     'menu.language': ('Idioma / Language', 'Idioma / Language'),
     'language.changed_title': ('Idioma alterado', 'Language changed'),
     'language.changed_body': ('O novo idioma será aplicado na próxima vez que você abrir o Duplo Player.',
@@ -181,7 +194,9 @@ _T = {
         '[ / ]   Diminuir / aumentar velocidade\nE   Avançar um quadro\n'
         '← / →   Retroceder / avançar 5 segundos\n1 / 2   Vídeo anterior / próximo vídeo\nN / P   Próximo / anterior\n'
         'S   Parar\nM   Silenciar\nCtrl+H   Ligar/desligar supressão de ruído\nF11   Tela cheia: somente vídeo\nEsc   Sair da tela cheia / seleção de zoom\n'
-        'Ctrl+L   Mostrar / ocultar lista\nCtrl+G   Iniciar / encerrar gravação em C:\\Videos\n\n'
+        'Ctrl+L   Mostrar / ocultar lista\nCtrl+G   Iniciar / encerrar gravação (um trecho) em C:\\Videos\n'
+        'Ctrl+Shift+G   Juntar os trechos gravados em um só vídeo\n\n'
+        'Em tela cheia, leve o mouse à parte de baixo para ver a barra de tempo.\n'
         'Ctrl+S e arraste para ampliar, inclusive em tela cheia.\nClique em uma perspectiva para selecioná-la. O zoom é independente.\n'
         'As duas perspectivas reproduzem o MESMO vídeo, com um único áudio.\n'
         'Clique direito na imagem para abrir a pasta ou enviar o vídeo à lixeira.\n'
@@ -196,7 +211,9 @@ _T = {
         '[ / ]   Decrease / increase speed\nE   Step one frame\n'
         '← / →   Rewind / forward 5 seconds\n1 / 2   Previous / next video\nN / P   Next / previous\n'
         'S   Stop\nM   Mute\nCtrl+H   Turn noise suppression on/off\nF11   Full screen: video only\nEsc   Leave full screen / zoom selection\n'
-        'Ctrl+L   Show / hide the list\nCtrl+G   Start / stop recording to C:\\Videos\n\n'
+        'Ctrl+L   Show / hide the list\nCtrl+G   Start / stop recording (one segment) to C:\\Videos\n'
+        'Ctrl+Shift+G   Join the recorded segments into one video\n\n'
+        'In full screen, move the mouse to the bottom to see the timeline.\n'
         'Ctrl+S and drag to zoom in, also in full screen.\nClick a view to select it. Zoom is independent for each view.\n'
         'Both views play the SAME video, with a single audio track.\n'
         'Right-click the image to open the folder or move the video to the Recycle Bin.\n'
