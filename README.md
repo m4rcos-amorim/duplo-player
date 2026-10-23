@@ -68,6 +68,19 @@ FFmpeg or the Visual C++ Redistributable: everything ships inside the app.
 > The guide [`SECURITY.md`](SECURITY.md) shows how to check the installer (SHA256, VirusTotal,
 > Windows Sandbox) and the scan result for this release.
 
+### Make it the default video player
+
+Windows does not let a program make itself the default, so it takes two steps. First offer Duplo Player
+for every format it plays (current user only, nothing is installed):
+
+```powershell
+.\tools\register-file-types.ps1
+```
+
+The script then opens **Settings > Apps > Default apps** on Duplo Player's page: set it for the formats
+you want (or choose it under "Open with" for a video, with "Always"). `-Exe <path>` registers another
+copy; `-Remove` undoes the registration.
+
 ### Antivirus warnings
 
 Executables built with PyInstaller and without a digital signature are sometimes flagged by a few

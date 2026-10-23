@@ -68,6 +68,19 @@ Python, VLC, FFmpeg nem o Visual C++ Redistributable: tudo vem dentro do aplicat
 > O guia [`SEGURANCA.md`](SEGURANCA.md) mostra como conferir o instalador (SHA256, VirusTotal,
 > Windows Sandbox) e o resultado da análise desta versão.
 
+### Usar como player de vídeo padrão
+
+O Windows não deixa um programa se definir sozinho como padrão, então são dois passos. Primeiro ofereça o
+Duplo Player para todos os formatos que ele reproduz (somente para o usuário atual, nada é instalado):
+
+```powershell
+.\tools\register-file-types.ps1
+```
+
+O script abre então **Configurações > Aplicativos > Aplicativos padrão** na página do Duplo Player: defina-o
+para os formatos que quiser (ou escolha-o em "Abrir com" de um vídeo, com "Sempre"). `-Exe <caminho>`
+registra outra cópia; `-Remove` desfaz o registro.
+
 ### Aviso de antivírus
 
 Executáveis gerados com PyInstaller e sem assinatura digital costumam ser marcados por alguns
