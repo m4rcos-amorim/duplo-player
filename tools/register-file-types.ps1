@@ -42,7 +42,8 @@ if ($Remove) {
         $key = "$Classes\$ext\OpenWithProgids"
         if (Test-Path $key) { Remove-ItemProperty -Path $key -Name $ProgId -ErrorAction SilentlyContinue }
     }
-    foreach ($key in "$Classes\$ProgId", "$Classes\Applications\DuploPlayer.exe", 'HKCU:\Software\DuploPlayer') {
+    foreach ($key in "$Classes\$ProgId", "$Classes\Applications\DuploPlayer.exe", 'HKCU:\Software\DuploPlayer',
+                     'HKCU:\Software\Microsoft\Windows\CurrentVersion\App Paths\DuploPlayer.exe') {
         if (Test-Path $key) { Remove-Item -Path $key -Recurse -Force }
     }
     Remove-ItemProperty -Path 'HKCU:\Software\RegisteredApplications' -Name $AppName -ErrorAction SilentlyContinue
@@ -59,11 +60,19 @@ Set-Default "$Classes\$ProgId" 'Vídeo (Duplo Player)'
 Set-ItemProperty -Path "$Classes\$ProgId" -Name 'FriendlyTypeName' -Value 'Vídeo (Duplo Player)'
 Set-Default "$Classes\$ProgId\DefaultIcon" "`"$Exe`",0"
 Set-Default "$Classes\$ProgId\shell\open\command" $command
+New-ItemProperty -Path "$Classes\$ProgId\shell\open" -Name 'FriendlyAppName' -Value $AppName -PropertyType String -Force | Out-Null
+# Name and icon shown in "Open with" and Default apps (the exe has no version resource).
+New-Item -Path "$Classes\$ProgId\Application" -Force | Out-Null
+Set-ItemProperty -Path "$Classes\$ProgId\Application" -Name 'ApplicationName' -Value $AppName
+Set-ItemProperty -Path "$Classes\$ProgId\Application" -Name 'ApplicationIcon' -Value "`"$Exe`",0"
 
-# "Open with" entry for the executable itself.
-Set-Default "$Classes\Applications\DuploPlayer.exe\shell\open\command" $command
-Set-ItemProperty -Path "$Classes\Applications\DuploPlayer.exe" -Name 'FriendlyAppName' -Value $AppName
-New-Item -Path "$Classes\Applications\DuploPlayer.exe\SupportedTypes" -Force | Out-Null
+# A choice saved as "Applications\DuploPlayer.exe" (picked by browsing to an exe) did not
+# start the player on Windows 11 and kept pointing at a removed copy. Drop that entry so
+# Windows offers the ProgID above, and point the exe name at this copy.
+if (Test-Path "$Classes\Applications\DuploPlayer.exe") { Remove-Item "$Classes\Applications\DuploPlayer.exe" -Recurse -Force }
+$appPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\App Paths\DuploPlayer.exe'
+Set-Default $appPath $Exe
+Set-ItemProperty -Path $appPath -Name 'Path' -Value (Split-Path $Exe)
 
 # Capabilities make Duplo Player appear in Settings > Default apps.
 $capabilities = "HKCU:\$CapabilitiesPath"
@@ -77,7 +86,6 @@ Set-ItemProperty -Path 'HKCU:\Software\RegisteredApplications' -Name $AppName -V
 foreach ($ext in $Extensions) {
     New-Item -Path "$Classes\$ext\OpenWithProgids" -Force | Out-Null
     New-ItemProperty -Path "$Classes\$ext\OpenWithProgids" -Name $ProgId -PropertyType String -Value '' -Force | Out-Null
-    New-ItemProperty -Path "$Classes\Applications\DuploPlayer.exe\SupportedTypes" -Name $ext -PropertyType String -Value '' -Force | Out-Null
     Set-ItemProperty -Path "$capabilities\FileAssociations" -Name $ext -Value $ProgId
 }
 Send-AssociationChanged
