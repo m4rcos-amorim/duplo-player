@@ -266,10 +266,9 @@ por exemplo um no início, um no meio e outro no fim, inclusive de vídeos difer
 na ordem em que foram gravados, em um único `Duplo_…_joined.mp4` em C:\Videos. Se um trecho ainda estiver
 sendo gravado, ele é finalizado primeiro e vira a última parte. A junção copia os fluxos sem recodificar,
 então é rápida e mantém a qualidade: os trechos seguintes usam a resolução do primeiro, com barras pretas se
-a janela mudou de tamanho. Depois que o vídeo unido é salvo e sua duração é conferida com a dos trechos, os
-arquivos dos trechos são excluídos definitivamente (não passam pela lixeira); se a junção falhar, eles são
-mantidos. São necessários pelo menos
-dois trechos.
+a janela mudou de tamanho. A junção só cria um arquivo novo: as gravações dos trechos continuam como estão.
+São apagados apenas os arquivos temporários da própria junção, e um vídeo unido que falhe ou fique mais curto
+que os trechos é descartado. São necessários pelo menos dois trechos.
 
 ### Atalhos
 

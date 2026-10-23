@@ -545,14 +545,12 @@ class PlayerWindow(QMainWindow):
         if count:
             self.record_info.setText(tr('rec.segments', n=count, path=self.recorder.segments[-1]))
 
-    def _segments_joined(self, path, error, count, kept):
+    def _segments_joined(self, path, error, count):
         if not path:
             self.record_info.setText(tr('rec.failed_info', message=error))
             QMessageBox.warning(self, tr('rec.join_failed_title'), tr('rec.join_kept', error=error))
             return
         message = tr('rec.joined', n=count, path=path)
-        if kept:
-            message += ' • ' + tr('rec.join_not_deleted', names=kept)
         self.record_info.setText(message)
         self.statusBar().showMessage(message, 10000)
 

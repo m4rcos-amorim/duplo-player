@@ -76,13 +76,15 @@ def run():
             window.recorder.joined.connect(lambda *args: joined.append(args))
             window.join_recordings()
             wait(lambda: joined)
-            path, error, count, kept = joined[0]
-            assert path and not error and count == 3 and not kept, joined
+            path, error, count = joined[0]
+            assert path and not error and count == 3, joined
             size, duration, audio = probe(path)
             total = sum(item[1] for item in probes)
             assert size == probes[0][0] and audio, (size, audio)
             assert abs(duration - total) < .35, (duration, total)
-            assert not any(path.exists() for path in segments), 'segments were not deleted'
+            # The join creates a new file only: every segment recording is kept, only temporaries go.
+            assert all(path.is_file() for path in segments), 'a segment recording was deleted'
+            assert not list(output.glob('.*.work')), list(output.glob('.*.work'))
             assert window.recorder.segments == [] and not window.join_button.isEnabled()
             assert window.record_info.text().endswith(path), window.record_info.text()
             results.append({'joined_mp4': path, 'segments': 3, 'size': list(size), 'duration': duration,
@@ -95,18 +97,21 @@ def run():
             pump(.6)
             window.join_recordings()
             wait(lambda: joined)
-            path, error, count, kept = joined[0]
+            path, error, count = joined[0]
             assert path and not error and count == 2, joined
-            assert not first.exists() and not window.recorder.path.exists()
-            results.append('join while recording finishes the segment first; segments deleted')
+            assert first.is_file() and window.recorder.path.is_file()
+            results.append('join while recording finishes the segment first; segments kept')
             # A joined file shorter than its segments is discarded and the segments are kept.
             joined.clear()
             kept = [record(window, .6), record(window, .6)]
+            joined_before = len(list(output.glob('*_joined.mp4')))
             with patch('duplo.recording.media_duration', side_effect=lambda path: 0.0 if '_joined' in str(path) else 5.0):
                 window.join_recordings()
                 wait(lambda: joined)
-            path, error, count, _ = joined[0]
+            path, error, count = joined[0]
             assert not path and error and all(item.exists() for item in kept), joined
+            assert len(list(output.glob('*_joined.mp4'))) == joined_before, 'partial join left behind'
+            assert not list(output.glob('.*.work'))
             assert window.recorder.segments == kept
             errors.clear()
             results.append('incomplete join keeps the segments')

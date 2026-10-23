@@ -128,7 +128,6 @@ _T = {
                       'Record at least two segments with Ctrl+G before joining.'),
     'rec.joining': ('Juntando {n} trechos em um só vídeo…', 'Joining {n} segments into one video…'),
     'rec.joined': ('Vídeo único salvo ({n} trechos): {path}', 'Single video saved ({n} segments): {path}'),
-    'rec.join_not_deleted': ('trechos não excluídos: {names}', 'segments not deleted: {names}'),
     'rec.join_incomplete': ('O vídeo unido ficou mais curto que a soma dos trechos e foi descartado.',
                             'The joined video came out shorter than the segments together and was discarded.'),
     'rec.join_failed_title': ('Não foi possível juntar os trechos', 'Could not join the segments'),

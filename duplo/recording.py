@@ -56,8 +56,8 @@ class ViewRecorder(QObject):
     failed = Signal(str)
     completed = Signal(str, str)
     segments_changed = Signal(int)
-    joined = Signal(str, str, int, str)
-    join_done = Signal(str, str, int, str)
+    joined = Signal(str, str, int)
+    join_done = Signal(str, str, int)
 
     def __init__(self, window):
         super().__init__(window)
@@ -243,12 +243,14 @@ class ViewRecorder(QObject):
         return True
 
     def _concat(self, sources, target, work):
+        # Creates a new video only: the segments are never changed or deleted.
+        # The only files removed are this join's own temporary ones.
+        listing = work / 'segments.txt'
         try:
             missing = [str(path) for path in sources if not path.is_file()]
             if missing:
                 raise FileNotFoundError(tr('rec.join_missing', paths='\n'.join(missing)))
             work.mkdir(parents=True)
-            listing = work / 'segments.txt'
             # Concat demuxer syntax: quote each path, escaping embedded quotes.
             listing.write_text(''.join("file '" + path.resolve().as_posix().replace("'", "'\\''") + "'\n"
                                        for path in sources), encoding='utf-8')
@@ -257,38 +259,27 @@ class ViewRecorder(QObject):
                 '-n', '-f', 'concat', '-safe', '0', '-i', str(listing), '-map', '0:v:0', '-map', '0:a:0',
                 '-c', 'copy', '-movflags', '+faststart', str(target)],
                 capture_output=True, timeout=600, creationflags=flags)
-            listing.unlink(missing_ok=True)
-            work.rmdir()
             if result.returncode or not target.is_file():
-                target.unlink(missing_ok=True)
                 raise RuntimeError(result.stderr.decode('utf-8', errors='replace')[-1000:])
-            # Segments are deleted for good below, so first make sure the
-            # joined file really holds all of them.
+            # A partial joined file is a leftover too: keep only a complete one.
             expected = sum(media_duration(path) for path in sources)
             if media_duration(target) < expected - 1:
-                target.unlink(missing_ok=True)
                 raise RuntimeError(tr('rec.join_incomplete'))
         except Exception as exc:
-            self.join_done.emit('', str(exc), len(sources), '')
+            target.unlink(missing_ok=True)
+            self.join_done.emit('', str(exc), len(sources))
             return
-        kept = []
-        for path in sources:
-            try:
-                self.discard_segment(path)
-            except Exception:
-                kept.append(path.name)
-        self.join_done.emit(str(target), '', len(sources), ', '.join(kept))
+        finally:
+            listing.unlink(missing_ok=True)
+            if work.is_dir():
+                work.rmdir()
+        self.join_done.emit(str(target), '', len(sources))
 
-    @staticmethod
-    def discard_segment(path):
-        # Permanent delete, not the Recycle Bin: these are the player's own
-        # recordings, already verified inside the joined video.
-        Path(path).unlink()
-
-    def _joined(self, path, error, count, kept):
+    def _joined(self, path, error, count):
         self.joining = False
         if path:
+            # The next join starts a new set; the joined files stay on disk.
             self.segments.clear()
             self.segment_size = None
             self.segments_changed.emit(0)
-        self.joined.emit(path, error, count, kept)
+        self.joined.emit(path, error, count)

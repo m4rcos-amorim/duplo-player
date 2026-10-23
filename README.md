@@ -253,8 +253,9 @@ example one at the beginning, one in the middle and one at the end, even across 
 recording order, into one `Duplo_…_joined.mp4` in C:\Videos. If a segment is still recording, it is finished
 first and becomes the last part. The join copies the streams without re-encoding, so it is fast and keeps the
 quality: every segment after the first uses the first one's resolution, with black bars if the window changed
-size. Once the joined video is saved and its length checked against the segments, the segment files are
-deleted permanently (they do not go to the Recycle Bin); if the join fails they are kept. At least two segments are needed.
+size. The join only creates a new file: the segment recordings are kept as they are. Only the join's own
+temporary files are deleted, and a joined file that fails or comes out shorter than the segments is discarded.
+At least two segments are needed.
 
 ### Shortcuts
 
