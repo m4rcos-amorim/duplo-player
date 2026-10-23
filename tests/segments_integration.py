@@ -1,6 +1,7 @@
 """Real segments recorded with Ctrl+G, joined into one MP4 with Ctrl+Shift+G."""
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -16,7 +17,9 @@ from duplo.window import PlayerWindow
 
 app = QApplication([])
 output = ROOT / 'test-output' / 'segments'
-output.mkdir(parents=True, exist_ok=True)
+shutil.rmtree(output, ignore_errors=True)  # fresh T1, T2… numbering on every run
+output.mkdir(parents=True)
+segments_dir, joined_dir = output / 'trechos', output / 'joined'
 results = []
 errors = []
 
@@ -57,7 +60,7 @@ def run():
         window.add_paths([ROOT / 'test-output' / 'teste_principal.mp4'])
         wait(lambda: window.views[0].frame is not None and window.engine.audio.sample_count > 0)
         start = window.recorder.start
-        # Ctrl+G records to C:\Videos; keep the test files in test-output.
+        # Ctrl+G records to C:\Videos\trechos; keep the test files in test-output.
         with patch.object(window.recorder, 'start', lambda: start(output)):
             segments = [record(window, 1.0)]
             # A different window size and layout between segments still joins losslessly.
@@ -69,6 +72,9 @@ def run():
             pump(.3)
             segments.append(record(window, .8))
             assert window.recorder.segments == segments, window.recorder.segments
+            assert [path.name for path in segments] == ['teste_principal_T1.mp4', 'teste_principal_T2.mp4',
+                                                        'teste_principal_T3.mp4'], segments
+            assert all(path.parent == segments_dir for path in segments), segments
             assert window.join_button.isEnabled()
             probes = [probe(path) for path in segments]
             assert len({size for size, _, _ in probes}) == 1, probes
@@ -84,7 +90,8 @@ def run():
             assert abs(duration - total) < .35, (duration, total)
             # The join creates a new file only: every segment recording is kept, only temporaries go.
             assert all(path.is_file() for path in segments), 'a segment recording was deleted'
-            assert not list(output.glob('.*.work')), list(output.glob('.*.work'))
+            assert Path(path) == joined_dir / 'teste_principal_joined.mp4', path
+            assert not list(output.rglob('.*.work')), list(output.rglob('.*.work'))
             assert window.recorder.segments == [] and not window.join_button.isEnabled()
             assert window.record_info.text().endswith(path), window.record_info.text()
             results.append({'joined_mp4': path, 'segments': 3, 'size': list(size), 'duration': duration,
@@ -100,18 +107,20 @@ def run():
             path, error, count = joined[0]
             assert path and not error and count == 2, joined
             assert first.is_file() and window.recorder.path.is_file()
+            assert first.name == 'teste_principal_T4.mp4', first
+            assert Path(path) == joined_dir / 'teste_principal_joined_2.mp4', path
             results.append('join while recording finishes the segment first; segments kept')
             # A joined file shorter than its segments is discarded and the segments are kept.
             joined.clear()
             kept = [record(window, .6), record(window, .6)]
-            joined_before = len(list(output.glob('*_joined.mp4')))
+            joined_before = len(list(joined_dir.glob('*.mp4')))
             with patch('duplo.recording.media_duration', side_effect=lambda path: 0.0 if '_joined' in str(path) else 5.0):
                 window.join_recordings()
                 wait(lambda: joined)
             path, error, count = joined[0]
             assert not path and error and all(item.exists() for item in kept), joined
-            assert len(list(output.glob('*_joined.mp4'))) == joined_before, 'partial join left behind'
-            assert not list(output.glob('.*.work'))
+            assert len(list(joined_dir.glob('*.mp4'))) == joined_before, 'partial join left behind'
+            assert not list(output.rglob('.*.work'))
             assert window.recorder.segments == kept
             errors.clear()
             results.append('incomplete join keeps the segments')

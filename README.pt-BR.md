@@ -163,7 +163,7 @@ Os limites conhecidos estão listados abaixo e em `VALIDACAO.md`.
 ## Limites conhecidos
 
 - Funciona apenas no Windows (usa pywin32, Explorer e lixeira do Windows).
-- As gravações são salvas em `C:\Videos`, caminho fixo no código.
+- As gravações são salvas em `C:\Videos\trechos` e os vídeos unidos em `C:\Videos\joined`, caminhos fixos no código.
 - Os testes usam vídeos sintéticos curtos; 4K/8K e todos os perfis de codec não foram certificados.
 
 ## Licença
@@ -241,7 +241,8 @@ o supressor sempre começa **desligado** ao abrir o player.
 ### Gravação
 
 Clique no círculo vermelho ou pressione **Ctrl+G** para começar e novamente
-para encerrar. O MP4 é salvo automaticamente em **C:\Videos**, com data e hora.
+para encerrar. O MP4 é salvo automaticamente em **C:\Videos\trechos**, com o nome do vídeo reproduzido:
+`nome do vídeo_T1.mp4`, depois `_T2`, `_T3` e assim por diante para novas gravações do mesmo vídeo.
 Em tela cheia, use Ctrl+G ou a opção de gravação do menu do botão direito.
 Durante a gravação, um indicador **● GRAVANDO** piscando, com o tempo gravado, aparece no canto superior
 direito do vídeo, inclusive em tela cheia; ele fica só na tela e nunca aparece na gravação.
@@ -255,7 +256,7 @@ Ao fechar o player, a gravação é finalizada antes de sair.
 A resolução é definida no início, limitada a 1920×1080, com 30 quadros/s e áudio
 AAC estéreo. Mudanças do tamanho da janela mantêm a proporção usando barras
 pretas. Durante a gravação, arquivos temporários ficam em uma pasta própria em
-C:\Videos; eles são removidos após a finalização. Em caso de falha, são preservados
+C:\Videos\trechos; eles são removidos após a finalização. Em caso de falha, são preservados
 para recuperação. Aguarde a mensagem **Gravação salva** antes de abrir o arquivo.
 
 #### Vários trechos em um só vídeo
@@ -263,7 +264,8 @@ para recuperação. Aguarde a mensagem **Gravação salva** antes de abrir o arq
 Cada início/fim com Ctrl+G grava um trecho, salvo como um MP4 próprio, como acima. Grave quantos quiser,
 por exemplo um no início, um no meio e outro no fim, inclusive de vídeos diferentes. Depois pressione
 **Ctrl+Shift+G** (ou o botão de juntar ao lado do botão de gravar, ou o menu do botão direito) para uni-los,
-na ordem em que foram gravados, em um único `Duplo_…_joined.mp4` em C:\Videos. Se um trecho ainda estiver
+na ordem em que foram gravados, em um novo `nome do vídeo_joined.mp4` em **C:\Videos\joined** (com o nome do vídeo do primeiro
+trecho; `_joined_2`, `_joined_3`… se esse nome já existir). Se um trecho ainda estiver
 sendo gravado, ele é finalizado primeiro e vira a última parte. A junção copia os fluxos sem recodificar,
 então é rápida e mantém a qualidade: os trechos seguintes usam a resolução do primeiro, com barras pretas se
 a janela mudou de tamanho. A junção só cria um arquivo novo: as gravações dos trechos continuam como estão.

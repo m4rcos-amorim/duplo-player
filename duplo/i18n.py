@@ -44,8 +44,8 @@ _T = {
     'ab.range': ('A {a} → B {b}', 'A {a} → B {b}'),
     'zoom.full': ('quadro completo', 'full frame'),
     'zoom.factor': ('zoom {factor:.1f}×', 'zoom {factor:.1f}×'),
-    'record.idle': ('Gravações: C:\\Videos • Ctrl+G inicia / encerra',
-                    'Recordings: C:\\Videos • Ctrl+G starts / stops'),
+    'record.idle': ('Trechos: C:\\Videos\\trechos • Ctrl+G inicia / encerra • unidos: C:\\Videos\\joined',
+                    'Segments: C:\\Videos\\trechos • Ctrl+G starts / stops • joined: C:\\Videos\\joined'),
 
     # --- main window: buttons (also used as tooltips and accessible names) ---
     'btn.open_files': ('Abrir vídeos', 'Open videos'),
@@ -56,7 +56,7 @@ _T = {
     'btn.stop': ('Parar', 'Stop'),
     'btn.frame': ('Avançar quadro', 'Step one frame'),
     'btn.order': ('Ordem: {mode}', 'Order: {mode}'),
-    'btn.record': ('Iniciar / encerrar gravação em C:\\Videos', 'Start / stop recording to C:\\Videos'),
+    'btn.record': ('Iniciar / encerrar gravação em C:\\Videos\\trechos', 'Start / stop recording to C:\\Videos\\trechos'),
     'btn.join': ('Juntar os trechos gravados em um só vídeo', 'Join the recorded segments into one video'),
     'btn.noise': ('Ligar / desligar supressão de ruído', 'Turn noise suppression on / off'),
     'btn.mute': ('Silenciar', 'Mute'),
@@ -120,7 +120,7 @@ _T = {
     # --- recording ---
     'rec.badge': ('GRAVANDO', 'REC'),
     'rec.stop_tip': ('Encerrar gravação (Ctrl+G)', 'Stop recording (Ctrl+G)'),
-    'rec.start_tip': ('Gravar exibição em C:\\Videos (Ctrl+G)', 'Record the display to C:\\Videos (Ctrl+G)'),
+    'rec.start_tip': ('Gravar exibição em C:\\Videos\\trechos (Ctrl+G)', 'Record the display to C:\\Videos\\trechos (Ctrl+G)'),
     'rec.active': ('● GRAVANDO trecho {n} • Ctrl+G encerra • {path}', '● RECORDING segment {n} • Ctrl+G stops • {path}'),
     'rec.segments': ('{n} trecho(s) gravado(s) • Ctrl+G grava outro • Ctrl+Shift+G junta em um só vídeo • {path}',
                      '{n} segment(s) recorded • Ctrl+G records another • Ctrl+Shift+G joins them into one video • {path}'),
@@ -198,8 +198,8 @@ _T = {
         '[ / ]   Diminuir / aumentar velocidade\nE   Avançar um quadro\n'
         '← / →   Retroceder / avançar 5 segundos\n↑ / ↓   Aumentar / diminuir volume (5%)\n1 / 2   Vídeo anterior / próximo vídeo\nN / P   Próximo / anterior\n'
         'S   Parar\nM   Silenciar\nCtrl+H   Ligar/desligar supressão de ruído\nF11   Tela cheia: somente vídeo\nEsc   Sair da tela cheia / seleção de zoom\n'
-        'Ctrl+L   Mostrar / ocultar lista\nCtrl+G   Iniciar / encerrar gravação (um trecho) em C:\\Videos\n'
-        'Ctrl+Shift+G   Juntar os trechos gravados em um só vídeo\n\n'
+        'Ctrl+L   Mostrar / ocultar lista\nCtrl+G   Iniciar / encerrar gravação (um trecho) em C:\\Videos\\trechos\n'
+        'Ctrl+Shift+G   Juntar os trechos gravados em um só vídeo em C:\\Videos\\joined\n\n'
         'Em tela cheia, leve o mouse à parte de baixo para ver a barra de tempo.\n'
         'Ctrl+S e arraste para ampliar, inclusive em tela cheia.\nClique em uma perspectiva para selecioná-la. O zoom é independente.\n'
         'As duas perspectivas reproduzem o MESMO vídeo, com um único áudio.\n'
@@ -215,8 +215,8 @@ _T = {
         '[ / ]   Decrease / increase speed\nE   Step one frame\n'
         '← / →   Rewind / forward 5 seconds\n↑ / ↓   Volume up / down (5%)\n1 / 2   Previous / next video\nN / P   Next / previous\n'
         'S   Stop\nM   Mute\nCtrl+H   Turn noise suppression on/off\nF11   Full screen: video only\nEsc   Leave full screen / zoom selection\n'
-        'Ctrl+L   Show / hide the list\nCtrl+G   Start / stop recording (one segment) to C:\\Videos\n'
-        'Ctrl+Shift+G   Join the recorded segments into one video\n\n'
+        'Ctrl+L   Show / hide the list\nCtrl+G   Start / stop recording (one segment) to C:\\Videos\\trechos\n'
+        'Ctrl+Shift+G   Join the recorded segments into one video in C:\\Videos\\joined\n\n'
         'In full screen, move the mouse to the bottom to see the timeline.\n'
         'Ctrl+S and drag to zoom in, also in full screen.\nClick a view to select it. Zoom is independent for each view.\n'
         'Both views play the SAME video, with a single audio track.\n'

@@ -160,7 +160,7 @@ really worked. The known limits are listed below and in `VALIDATION.md`.
 ## Known limits
 
 - Windows only (uses pywin32, Explorer and the Windows Recycle Bin).
-- Recordings are saved to `C:\Videos`, a path fixed in the code.
+- Recordings are saved to `C:\Videos\trechos` and joined videos to `C:\Videos\joined`, paths fixed in the code.
 - The tests use short synthetic videos; 4K/8K and every codec profile have not been certified.
 
 ## License
@@ -231,7 +231,8 @@ you close the app, but the suppressor always starts **off** when the player open
 ### Recording
 
 Click the red circle or press **Ctrl+G** to start, and again to stop. The MP4 is saved automatically to
-**C:\Videos**, with the date and time in the name. In full screen, use Ctrl+G or the recording option in the
+**C:\Videos\trechos**, named after the video being played: `video name_T1.mp4`, then `_T2`, `_T3` and so on for
+more recordings of the same video. In full screen, use Ctrl+G or the recording option in the
 right-click menu. While recording, a blinking **● REC** badge with the recorded time shows in the top-right
 corner of the video, also in full screen; it is only on screen and never appears in the recording.
 
@@ -242,7 +243,7 @@ When you close the player, the recording is finished before it exits.
 
 The resolution is set at the start, capped at 1920×1080, at 30 frames/s with stereo AAC audio. Resizing
 the window keeps the aspect ratio using black bars. While recording, temporary files live in their own
-folder inside C:\Videos; they are removed once the recording is finished. If something fails they are kept
+folder inside C:\Videos\trechos; they are removed once the recording is finished. If something fails they are kept
 so you can recover them. Wait for the **Recording saved** message before opening the file.
 
 #### Several segments in one video
@@ -250,7 +251,8 @@ so you can recover them. Wait for the **Recording saved** message before opening
 Each Ctrl+G start/stop records one segment, saved as its own MP4 as above. Record as many as you like, for
 example one at the beginning, one in the middle and one at the end, even across different videos. Then press
 **Ctrl+Shift+G** (or the join button next to the record button, or the right-click menu) to join them, in
-recording order, into one `Duplo_…_joined.mp4` in C:\Videos. If a segment is still recording, it is finished
+recording order, into one new `video name_joined.mp4` in **C:\Videos\joined** (named after the first segment's
+video; `_joined_2`, `_joined_3`… if that name exists). If a segment is still recording, it is finished
 first and becomes the last part. The join copies the streams without re-encoding, so it is fast and keeps the
 quality: every segment after the first uses the first one's resolution, with black bars if the window changed
 size. The join only creates a new file: the segment recordings are kept as they are. Only the join's own

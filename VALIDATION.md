@@ -293,3 +293,12 @@ Run on Windows 11 Pro (10.0.26200), Python 3.11, VLC 3.0.24 — 2026-10-21:
   the window, not of the views, so the recording never contains it.
 - 74 unit tests passed (3 new). `recording_integration.py` and `segments_integration.py` passed. A real
   2.3 s recording made with the badge on screen was decoded: its last frame has no badge.
+
+## Recording folders and names — 23/10/2026
+
+- Each Ctrl+G recording goes to `C:\Videos\trechos` as `<video name>_T<n>.mp4`, numbered per source video after
+  the highest number already there. Joined videos go to `C:\Videos\joined` as `<first segment's video>_joined.mp4`
+  (`_joined_2`, `_joined_3`… instead of overwriting).
+- 77 unit tests passed (3 new for the names). `segments_integration.py` produced `trechos\teste_principal_T1…T7.mp4`
+  and `joined\teste_principal_joined.mp4` and `_joined_2.mp4`, with no temporary folder left;
+  `recording_integration.py` passed.

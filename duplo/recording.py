@@ -17,6 +17,29 @@ from PySide6.QtGui import QImage, QPainter
 
 
 RECORDINGS = Path('C:/Videos')
+# Inside RECORDINGS: each Ctrl+G recording, and the videos joined from them.
+SEGMENTS = 'trechos'
+JOINED = 'joined'
+
+
+def segment_path(folder, source):
+    """Next free '<video name>_T<n>.mp4' in folder, numbered per source video."""
+    stem = Path(source).stem if source else 'Duplo'
+    pattern = re.compile(re.escape(stem) + r'_T(\d+)\.mp4', re.IGNORECASE)
+    used = [int(match.group(1)) for item in folder.iterdir()
+            if (match := pattern.fullmatch(item.name))]
+    return folder / f'{stem}_T{max(used, default=0) + 1}.mp4'
+
+
+def joined_path(folder, segments):
+    """'<video name>_joined.mp4' named after the first segment's video, never overwriting."""
+    stem = re.sub(r'_T\d+$', '', Path(segments[0]).stem, flags=re.IGNORECASE)
+    target = folder / f'{stem}_joined.mp4'
+    number = 2
+    while target.exists():
+        target = folder / f'{stem}_joined_{number}.mp4'
+        number += 1
+    return target
 
 
 def media_duration(path):
@@ -69,6 +92,7 @@ class ViewRecorder(QObject):
         self.join_done.connect(self._joined)
         self.active = self.finishing = self.joining = False
         self.path = self.error = None
+        self.root = RECORDINGS
         self.video_number = self.audio_number = 0
         # Recordings since the last join. They share one frame size, so the
         # join is a lossless stream copy.
@@ -81,11 +105,11 @@ class ViewRecorder(QObject):
             return
         if self.window.views[0].frame is None:
             raise RuntimeError(tr('rec.no_frame'))
-        folder = Path(folder)
+        self.root = Path(folder)
+        folder = self.root / SEGMENTS
         folder.mkdir(parents=True, exist_ok=True)
-        name = 'Duplo_' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f')
-        self.path = folder / (name + '.mp4')
-        self.work = folder / ('.' + name + '.work')
+        self.path = segment_path(folder, self.window._displayed_path)
+        self.work = folder / ('.' + self.path.stem + '_' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f') + '.work')
         self.work.mkdir()
         self.ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
         if self.segments and self.segment_size is not None:
@@ -233,10 +257,10 @@ class ViewRecorder(QObject):
         if self.joining or len(self.segments) < 2:
             return False
         sources = list(self.segments)
-        folder = Path(folder) if folder else sources[-1].parent
-        name = 'Duplo_' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f') + '_joined'
-        target = folder / (name + '.mp4')
-        work = folder / ('.' + name + '.work')
+        folder = Path(folder) if folder else self.root / JOINED
+        folder.mkdir(parents=True, exist_ok=True)
+        target = joined_path(folder, sources)
+        work = folder / ('.' + target.stem + '_' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f') + '.work')
         self.joining = True
         threading.Thread(target=self._concat, args=(sources, target, work), daemon=True,
                          name='Duplo join').start()

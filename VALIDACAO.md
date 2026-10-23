@@ -293,3 +293,12 @@ Rodado no Windows 11 Pro (10.0.26200), Python 3.11, VLC 3.0.24 — 21/10/2026:
   vídeo. Ele é filho da janela, não das perspectivas, por isso nunca entra na gravação.
 - 74 testes unitários aprovados (3 novos). `recording_integration.py` e `segments_integration.py` passaram.
   Uma gravação real de 2,3 s feita com o indicador na tela foi decodificada: o último quadro não tem o indicador.
+
+## Pastas e nomes das gravações — 23/10/2026
+
+- Cada gravação com Ctrl+G vai para `C:\Videos\trechos` como `<nome do vídeo>_T<n>.mp4`, numerada por vídeo de
+  origem depois do maior número já existente. Os vídeos unidos vão para `C:\Videos\joined` como
+  `<vídeo do primeiro trecho>_joined.mp4` (`_joined_2`, `_joined_3`… em vez de sobrescrever).
+- 77 testes unitários aprovados (3 novos para os nomes). `segments_integration.py` gerou
+  `trechos\teste_principal_T1…T7.mp4` e `joined\teste_principal_joined.mp4` e `_joined_2.mp4`, sem pasta
+  temporária sobrando; `recording_integration.py` passou.
