@@ -284,3 +284,12 @@ Rodado no Windows 11 Pro (10.0.26200), Python 3.11, VLC 3.0.24 — 21/10/2026:
   unidos em um MP4 de 3,12 s com áudio AAC, decodificado sem erros; Ctrl+Shift+G durante a gravação
   finalizou aquele trecho e juntou 2 trechos; os arquivos dos trechos unidos foram excluídos, e um vídeo
   unido mais curto que os trechos (simulado) foi descartado, mantendo os trechos.
+
+## Volume com ↑/↓ e indicador de gravação na tela — 23/10/2026
+
+- ↑ / ↓ mudam o volume em 5% (0–100%) no modo janela e em tela cheia, inclusive com o foco na barra de volume
+  ou na velocidade; ↑ também tira do silêncio. Na lista, ↑ / ↓ continuam passando entre os vídeos.
+- Durante a gravação, um indicador "● GRAVANDO 00:00:00" piscando fica sobre o canto superior direito do
+  vídeo. Ele é filho da janela, não das perspectivas, por isso nunca entra na gravação.
+- 74 testes unitários aprovados (3 novos). `recording_integration.py` e `segments_integration.py` passaram.
+  Uma gravação real de 2,3 s feita com o indicador na tela foi decodificada: o último quadro não tem o indicador.

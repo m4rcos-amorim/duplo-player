@@ -82,8 +82,10 @@ _T = {
                            'Suppression strength: {percent}% (0% = original audio)'),
     'noise.off': ('desligada', 'off'),
     'noise.tip': ('Supressão de ruído: {state} (Ctrl+H)', 'Noise suppression: {state} (Ctrl+H)'),
+    'volume.tip': ('Volume: {percent}% (↑ / ↓)', 'Volume: {percent}% (↑ / ↓)'),
 
     # --- status bar ---
+    'status.volume': ('Volume: {percent}%', 'Volume: {percent}%'),
     'status.start': ('Abra um vídeo para começar. Passe o mouse nos ícones para ver suas funções.',
                      'Open a video to start. Hover over the icons to see what they do.'),
     'status.added': ('{n} vídeo(s) adicionado(s) à lista.', '{n} video(s) added to the list.'),
@@ -116,6 +118,7 @@ _T = {
                            'Playback failed. The file may be damaged or use an unsupported codec.'),
 
     # --- recording ---
+    'rec.badge': ('GRAVANDO', 'REC'),
     'rec.stop_tip': ('Encerrar gravação (Ctrl+G)', 'Stop recording (Ctrl+G)'),
     'rec.start_tip': ('Gravar exibição em C:\\Videos (Ctrl+G)', 'Record the display to C:\\Videos (Ctrl+G)'),
     'rec.active': ('● GRAVANDO trecho {n} • Ctrl+G encerra • {path}', '● RECORDING segment {n} • Ctrl+G stops • {path}'),
@@ -194,7 +197,7 @@ _T = {
         '-   Câmera lenta: 0,75× → 0,5× → 0,25× (limite do atalho)\n'
         '+   Aumentar velocidade, passar por 1× e acelerar até 2×\n'
         '[ / ]   Diminuir / aumentar velocidade\nE   Avançar um quadro\n'
-        '← / →   Retroceder / avançar 5 segundos\n1 / 2   Vídeo anterior / próximo vídeo\nN / P   Próximo / anterior\n'
+        '← / →   Retroceder / avançar 5 segundos\n↑ / ↓   Aumentar / diminuir volume (5%)\n1 / 2   Vídeo anterior / próximo vídeo\nN / P   Próximo / anterior\n'
         'S   Parar\nM   Silenciar\nCtrl+H   Ligar/desligar supressão de ruído\nF11   Tela cheia: somente vídeo\nEsc   Sair da tela cheia / seleção de zoom\n'
         'Ctrl+L   Mostrar / ocultar lista\nCtrl+G   Iniciar / encerrar gravação (um trecho) em C:\\Videos\n'
         'Ctrl+Shift+G   Juntar os trechos gravados em um só vídeo\n\n'
@@ -211,7 +214,7 @@ _T = {
         '-   Slow motion: 0.75× → 0.5× → 0.25× (the shortcut stops there)\n'
         '+   Speed up, passing through 1× and up to 2×\n'
         '[ / ]   Decrease / increase speed\nE   Step one frame\n'
-        '← / →   Rewind / forward 5 seconds\n1 / 2   Previous / next video\nN / P   Next / previous\n'
+        '← / →   Rewind / forward 5 seconds\n↑ / ↓   Volume up / down (5%)\n1 / 2   Previous / next video\nN / P   Next / previous\n'
         'S   Stop\nM   Mute\nCtrl+H   Turn noise suppression on/off\nF11   Full screen: video only\nEsc   Leave full screen / zoom selection\n'
         'Ctrl+L   Show / hide the list\nCtrl+G   Start / stop recording (one segment) to C:\\Videos\n'
         'Ctrl+Shift+G   Join the recorded segments into one video\n\n'

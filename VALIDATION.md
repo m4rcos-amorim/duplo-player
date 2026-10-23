@@ -284,3 +284,12 @@ Run on Windows 11 Pro (10.0.26200), Python 3.11, VLC 3.0.24 — 2026-10-21:
   view, all 1268×644, joined into one 3.12 s MP4 with AAC audio that decodes without errors; Ctrl+Shift+G
   while recording finished that segment and joined 2 segments; the joined segment files were deleted, and a
   joined file shorter than its segments (simulated) was discarded with the segments kept.
+
+## Volume with ↑/↓ and an on-screen recording badge — 23/10/2026
+
+- ↑ / ↓ change the volume by 5% (0–100%) in windowed mode and full screen, also while the volume slider or the
+  speed box has focus; ↑ also unmutes. In the playlist, ↑ / ↓ still move between videos.
+- While recording, a blinking "● REC 00:00:00" badge sits over the video's top-right corner. It is a child of
+  the window, not of the views, so the recording never contains it.
+- 74 unit tests passed (3 new). `recording_integration.py` and `segments_integration.py` passed. A real
+  2.3 s recording made with the badge on screen was decoded: its last frame has no badge.

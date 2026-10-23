@@ -243,6 +243,8 @@ o supressor sempre começa **desligado** ao abrir o player.
 Clique no círculo vermelho ou pressione **Ctrl+G** para começar e novamente
 para encerrar. O MP4 é salvo automaticamente em **C:\Videos**, com data e hora.
 Em tela cheia, use Ctrl+G ou a opção de gravação do menu do botão direito.
+Durante a gravação, um indicador **● GRAVANDO** piscando, com o tempo gravado, aparece no canto superior
+direito do vídeo, inclusive em tela cheia; ele fica só na tela e nunca aparece na gravação.
 
 A gravação contém o vídeo exibido e seu áudio, sem controles, títulos, cursor,
 lista ou outros aplicativos. As perspectivas divididas aparecem lado a lado,
@@ -289,6 +291,7 @@ dois trechos.
 | [ / ] | Diminuir / aumentar velocidade |
 | E | Pausar e avançar um quadro |
 | ← / → | Retroceder / avançar 5 segundos |
+| ↑ / ↓ | Aumentar / diminuir o volume em 5%; aumentar também tira do silêncio |
 | 1 / 2 | Vídeo anterior / próximo vídeo |
 | N / P / S | Próximo / anterior / parar |
 | M | Silenciar |

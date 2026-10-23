@@ -232,7 +232,8 @@ you close the app, but the suppressor always starts **off** when the player open
 
 Click the red circle or press **Ctrl+G** to start, and again to stop. The MP4 is saved automatically to
 **C:\Videos**, with the date and time in the name. In full screen, use Ctrl+G or the recording option in the
-right-click menu.
+right-click menu. While recording, a blinking **● REC** badge with the recorded time shows in the top-right
+corner of the video, also in full screen; it is only on screen and never appears in the recording.
 
 The recording contains the displayed video and its audio, without controls, titles, cursor, list or other
 applications. Split views appear side by side, each with its own zoom. Changes of split, zoom, rotation,
@@ -275,6 +276,7 @@ deleted permanently (they do not go to the Recycle Bin); if the join fails they 
 | [ / ] | Decrease / increase speed |
 | E | Pause and step one frame |
 | ← / → | Rewind / forward 5 seconds |
+| ↑ / ↓ | Volume up / down in 5% steps; turning it up also unmutes |
 | 1 / 2 | Previous / next video |
 | N / P / S | Next / previous / stop |
 | M | Mute |

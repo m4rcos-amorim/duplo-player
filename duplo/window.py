@@ -66,6 +66,29 @@ class FloatingTimeline(QWidget):
                                               and cursor.y() >= area.height() - self.ZONE)
 
 
+class RecordingBadge(QLabel):
+    """Blinking '● REC' with the recorded time, over the video's top-right corner.
+
+    Like the timeline it is a child of the window, not of the views, so the
+    recording (composed from the views only) never contains it.
+    """
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setObjectName('recording_badge')
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.hide()
+
+    def show_time(self, seconds, area):
+        dot = '●' if int(time.monotonic() * 2) % 2 == 0 else '○'
+        self.setText(f"{dot} {tr('rec.badge')} {timestamp(int(seconds * 1000))}")
+        self.adjustSize()
+        self.move(area.right() - self.width() - 14, area.top() + 12)
+        if not self.isVisible():
+            self.show()
+        self.raise_()
+
+
 class PlayerWindow(QMainWindow):
     def __init__(self, silent=False, settings=True):
         super().__init__()
@@ -289,6 +312,7 @@ class PlayerWindow(QMainWindow):
         self.timeline = FloatingTimeline(root)
         self.timeline.slider.seek_requested.connect(self.seek_fraction)
         self.timeline.slider.sliderMoved.connect(self.seek_fraction)
+        self.recording_badge = RecordingBadge(root)
         self.statusBar().setSizeGripEnabled(False)
         self.statusBar().showMessage(tr('status.start'))
 
@@ -297,13 +321,24 @@ class PlayerWindow(QMainWindow):
         # navigation available while those controls have focus; menus/dialogs
         # retain their own keyboard navigation.
         if (event.type() == QEvent.Type.ShortcutOverride
+                and event.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down)
+                and isinstance(watched, QWidget)
+                and (watched is self.list_widget or self.list_widget.isAncestorOf(watched))):
+            # The list keeps Up/Down for moving between videos.
+            event.accept()
+            return True
+        if (event.type() == QEvent.Type.ShortcutOverride
                 and isinstance(watched, QWidget) and watched.window() is self
                 and (event.modifiers() in (Qt.KeyboardModifier.NoModifier,
                                            Qt.KeyboardModifier.KeypadModifier)
                      or (event.key() == Qt.Key.Key_Plus
                          and event.modifiers() == Qt.KeyboardModifier.ShiftModifier))
-                and event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right,
-                                    Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_Minus, Qt.Key.Key_Plus)):
+                and (event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right,
+                                     Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_Minus, Qt.Key.Key_Plus)
+                     # Up/Down set the volume, except while browsing the list.
+                     or (event.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down)
+                         and watched is not self.list_widget
+                         and not self.list_widget.isAncestorOf(watched)))):
             event.ignore()
             return True
         return super().eventFilter(watched, event)
@@ -319,7 +354,9 @@ class PlayerWindow(QMainWindow):
                      'N': self.next, 'P': self.previous, '1': self.previous, '2': self.next,
                      'S': self.stop, 'E': self.frame_step,
                      'M': self.toggle_mute, 'Left': lambda: self.seek_relative(-5000),
-                     'Right': lambda: self.seek_relative(5000), '[': lambda: self.rate_step(-1),
+                     'Right': lambda: self.seek_relative(5000),
+                     'Up': lambda: self.volume_step(5), 'Down': lambda: self.volume_step(-5),
+                     '[': lambda: self.rate_step(-1),
                      ']': lambda: self.rate_step(1), '-': self.slow_down, 'Num+-': self.slow_down,
                      '+': lambda: self.rate_step(1), 'Shift++': lambda: self.rate_step(1),
                      'Num++': lambda: self.rate_step(1),
@@ -623,6 +660,14 @@ class PlayerWindow(QMainWindow):
 
     def change_volume(self, value):
         self.engine.set_volume(value)
+        self.volume.setToolTip(tr('volume.tip', percent=value))
+
+    def volume_step(self, delta):
+        # Turning the volume up also unmutes, as in most players.
+        if delta > 0 and self.engine.muted:
+            self.toggle_mute()
+        self.volume.setValue(max(0, min(100, self.volume.value() + delta)))
+        self.statusBar().showMessage(tr('status.volume', percent=self.volume.value()), 3000)
 
     def toggle_mute(self):
         muted = not self.engine.muted
@@ -692,6 +737,13 @@ class PlayerWindow(QMainWindow):
             view.set_presentation(enabled)
         if not enabled:
             self.timeline.hide()
+
+    def update_recording_badge(self):
+        if self.recorder.active:
+            area = self.video_splitter.geometry()
+            self.recording_badge.show_time(self.recorder.video_number / 30, area)
+        else:
+            self.recording_badge.hide()
 
     def update_timeline(self, cursor=None):
         """Show the floating timeline in full screen only while the mouse is over its zone."""
@@ -878,6 +930,7 @@ class PlayerWindow(QMainWindow):
             for view in self.views:
                 view.set_frame(frame)
         self.update_timeline()
+        self.update_recording_badge()
         if not self._loaded:
             return
         player = self.engine.player

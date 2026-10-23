@@ -108,6 +108,82 @@ class PlayerUITests(unittest.TestCase):
                 QTest.keyClick(widget, Qt.Key.Key_Left)
                 self.assertEqual([call.args for call in seek.call_args_list], [(5000,), (-5000,)])
 
+    def test_up_down_change_volume_in_window_and_fullscreen(self):
+        window = self.window
+        window.volume.setValue(50)
+        for fullscreen in (False, True):
+            if fullscreen:
+                window.toggle_fullscreen()
+                QTest.qWait(30)
+            targets = [window.views[0]] if fullscreen else [window.views[0], window.volume, window.speed]
+            for widget in targets:
+                widget.setFocus()
+                QTest.qWait(10)
+                start = window.volume.value()
+                QTest.keyClick(widget, Qt.Key.Key_Up)
+                self.assertEqual(window.volume.value(), start + 5, (fullscreen, widget))
+                QTest.keyClick(widget, Qt.Key.Key_Down)
+                QTest.keyClick(widget, Qt.Key.Key_Down)
+                self.assertEqual(window.volume.value(), start - 5, (fullscreen, widget))
+                self.assertEqual(window.speed.currentData(), 1.0)
+        window.volume.setValue(98)
+        window.volume_step(5)
+        self.assertEqual(window.volume.value(), 100)
+        window.volume.setValue(3)
+        window.volume_step(-5)
+        self.assertEqual(window.volume.value(), 0)
+
+    def test_up_unmutes_and_list_keeps_arrow_navigation(self):
+        window = self.window
+        window.toggle_mute()
+        self.assertTrue(window.engine.muted)
+        window.volume_step(-5)
+        self.assertTrue(window.engine.muted)
+        window.volume_step(5)
+        self.assertFalse(window.engine.muted)
+        self.assertFalse(window.mute_button.isChecked())
+        with tempfile.TemporaryDirectory() as folder:
+            files = [Path(folder) / name for name in ('a.mp4', 'b.mp4', 'c.mp4')]
+            for path in files:
+                path.touch()
+            with patch.object(window.engine, 'load'):
+                window.add_paths(files)
+            window.toggle_sidebar()
+            window.list_widget.setCurrentRow(0)
+            window.list_widget.setFocus()
+            QTest.qWait(10)
+            volume = window.volume.value()
+            QTest.keyClick(window.list_widget, Qt.Key.Key_Down)
+            self.assertEqual(window.list_widget.currentRow(), 1)
+            self.assertEqual(window.volume.value(), volume)
+
+    def test_recording_badge_shows_while_recording_but_is_not_recorded(self):
+        from duplo.recording import compose_video
+        window = self.window
+        window.timer.stop()
+        window.update_recording_badge()
+        self.assertFalse(window.recording_badge.isVisible())
+        QTest.qWait(30)
+        size = window.video_splitter.size()
+        before = compose_video(window.views, window.split, size, size)
+        for fullscreen in (False, True):
+            if fullscreen:
+                window.toggle_fullscreen()
+                QTest.qWait(30)
+            with patch.object(window.recorder, 'active', True), patch.object(window.recorder, 'video_number', 30 * 75):
+                window.update_recording_badge()
+                badge = window.recording_badge
+                self.assertTrue(badge.isVisible())
+                self.assertIn(tr('rec.badge'), badge.text())
+                self.assertIn('00:01:15', badge.text())
+                self.assertTrue(window.video_splitter.geometry().contains(badge.geometry()))
+                self.assertFalse(any(view.isAncestorOf(badge) for view in window.views))
+                if not fullscreen:
+                    # The same picture is recorded with or without the badge on screen.
+                    self.assertEqual(compose_video(window.views, window.split, size, size), before)
+            window.update_recording_badge()
+            self.assertFalse(window.recording_badge.isVisible())
+
     def test_one_and_two_navigate_playlist_in_window_and_fullscreen(self):
         with tempfile.TemporaryDirectory() as folder:
             paths = [Path(folder) / f'video{i}.mp4' for i in range(3)]
